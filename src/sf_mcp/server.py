@@ -26,7 +26,7 @@ try:
 except ValueError:
     _mcp_port = 8080
 
-mcp = FastMCP("signal-found-onboard", host=_mcp_host, port=_mcp_port)
+mcp = FastMCP("signal-found-onboard", host=_mcp_host, port=_mcp_port, stateless_http=True)
 _session_client_id: str | None = None
 
 _ALLOWED_CONVERSION_STATES = {
@@ -81,19 +81,17 @@ def _set_session_client_id(client_id: str | None) -> None:
 
 
 def _require_client_id(explicit_client_id: str | None, settings: Settings) -> str:
+    # Explicit arg > session > env var default
+    if explicit_client_id and explicit_client_id.strip():
+        return explicit_client_id.strip()
     session_client_id = _get_session_client_id()
-    if not session_client_id:
-        raise ValueError(
-            "No authenticated client context found. New user? Run create_new_account(business_name, email) to sign up. Existing user? Run login_with_client_id(client_id) first."
-        )
-    if explicit_client_id:
-        requested = explicit_client_id.strip()
-        if requested and requested != session_client_id:
-            raise ValueError(
-                "Provided client_id does not match authenticated session context. "
-                "Run login_with_client_id with the desired client_id first."
-            )
-    return session_client_id
+    if session_client_id:
+        return session_client_id
+    if settings.default_client_id:
+        return settings.default_client_id
+    raise ValueError(
+        "No authenticated client context found. New user? Run create_new_account(business_name, email) to sign up. Existing user? Run login_with_client_id(client_id) first."
+    )
 
 
 _CREDIT_SUCCESS_URL = "https://signal-found.com/billing?payment=success"
