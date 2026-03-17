@@ -6,6 +6,7 @@
 [![PyPI](https://img.shields.io/pypi/v/sf-mcp)](https://pypi.org/project/sf-mcp/)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-green)](https://python.org)
 [![smithery badge](https://smithery.ai/badge/sf-mcp)](https://smithery.ai/server/sf-mcp)
+[![sf-mcp MCP server](https://glama.ai/mcp/servers/signal-found/sf-mcp/badges/score.svg)](https://glama.ai/mcp/servers/signal-found/sf-mcp)
 
 ---
 
