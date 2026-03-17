@@ -84,7 +84,7 @@ def _require_client_id(explicit_client_id: str | None, settings: Settings) -> st
     session_client_id = _get_session_client_id()
     if not session_client_id:
         raise ValueError(
-            "No authenticated client context found. Run login_with_client_id first."
+            "No authenticated client context found. New user? Run create_new_account(business_name, email) to sign up. Existing user? Run login_with_client_id(client_id) first."
         )
     if explicit_client_id:
         requested = explicit_client_id.strip()
@@ -376,15 +376,29 @@ def sf_health() -> dict[str, Any]:
         except Exception as exc:
             onboard_error = str(exc)
 
+        authenticated = bool(_get_session_client_id())
+        has_default = bool(settings.default_client_id)
+        next_steps: list[str] = []
+        if not authenticated and not has_default:
+            next_steps = [
+                "No client ID configured. New user? Run create_new_account(business_name, email) to create an account and get your client_id.",
+                "Existing user? Run login_with_client_id(client_id) to authenticate this session.",
+            ]
+        elif not authenticated:
+            next_steps = [
+                "Run login_with_client_id(client_id) to activate the default client ID for this session.",
+            ]
+
         return {
             "server": "signal-found-onboard",
             "base_url": settings.onboard_api_base_url,
             "session_client_id": _get_session_client_id(),
-            "authenticated": bool(_get_session_client_id()),
-            "default_client_id_configured": bool(settings.default_client_id),
+            "authenticated": authenticated,
+            "default_client_id_configured": has_default,
             "onboard_api_ok": onboard_ok,
             "onboard_api": onboard_health,
             "onboard_api_error": onboard_error,
+            **({"next_steps": next_steps} if next_steps else {}),
         }
     finally:
         client.close()
@@ -450,16 +464,26 @@ def agent_quickstart() -> dict[str, Any]:
     """
     return {
         "goal": "Safely run onboarding and campaign launch with minimal context.",
+        "new_user_path": [
+            "1. create_new_account(business_name, email) — creates account + auto-logs in",
+            "2. create_new_product(product_name, website_url) — initialize onboarding",
+            "3. run_full_agentic_onboarding(...) — execute the full staged flow",
+        ],
         "order": [
             {
                 "step": 1,
                 "tool": "sf_health",
-                "why": "Verify backend connectivity and session auth state.",
+                "why": "Verify backend connectivity and session auth state. If not authenticated and no client_id, see new_user_path.",
+            },
+            {
+                "step": "1b (new users only)",
+                "tool": "create_new_account",
+                "why": "Create a new Signal Found account. Returns client_id and auto-authenticates this session. Skip if you already have a client_id.",
             },
             {
                 "step": 2,
                 "tool": "login_with_client_id",
-                "why": "Set authenticated client context required by business tools.",
+                "why": "Set authenticated client context required by business tools. Skip if create_new_account was just called (it auto-logs in).",
             },
             {
                 "step": 3,

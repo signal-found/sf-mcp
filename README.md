@@ -66,6 +66,8 @@ Don't want to use your own account? We operate a private network of **hundreds o
 
 **Easiest: use our hosted server — nothing to install.**
 
+> **No account yet?** Leave `ONBOARD_API_CLIENT_ID` blank and ask your AI agent to run `create_new_account("Your Company", "you@example.com")` — it will sign you up and authenticate the session automatically.
+
 Get your `client_id` at [signal-found.com](https://signal-found.com), then pick your client below.
 
 ---
