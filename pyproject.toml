@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sf-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "Signal Found MCP server — connect AI agents to the world's largest Reddit outreach network"
 readme = "README.md"
 license = { text = "MIT" }

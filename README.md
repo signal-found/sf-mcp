@@ -354,3 +354,5 @@ MCP_TRANSPORT=stdio
 ---
 
 © 2025 Signal Found. All rights reserved.
+
+<!-- mcp-name: io.github.signal-found/sf-mcp -->
