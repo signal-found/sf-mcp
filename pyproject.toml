@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sf-mcp"
+version = "0.1.0"
+description = "Signal Found MCP server — connect AI agents to the world's largest Reddit outreach network"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "mcp>=1.26.0,<2.0.0",
+  "httpx>=0.27.0",
+]
+
+[project.scripts]
+sf-mcp = "sf_mcp.server:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
