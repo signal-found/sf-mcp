@@ -2443,22 +2443,19 @@ def billing_and_credits(
             client_id=resolved_client_id,
         )
 
-        checkout: dict[str, Any] | None = None
+        checkout_links: dict[str, Any] = {}
         checkout_error: str | None = None
         if include_checkout_preview:
-            if not success_url or not cancel_url:
-                checkout_error = "success_url and cancel_url are required when include_checkout_preview=true"
-            else:
+            s_url = success_url or _CREDIT_SUCCESS_URL
+            c_url = cancel_url or _CREDIT_CANCEL_URL
+            for plan in ("starter", "pro", "automation"):
                 try:
-                    checkout = client.post(
+                    resp = client.post(
                         "/credits/checkout",
                         client_id=resolved_client_id,
-                        json={
-                            "plan": checkout_plan,
-                            "success_url": success_url,
-                            "cancel_url": cancel_url,
-                        },
+                        json={"plan": plan, "success_url": s_url, "cancel_url": c_url},
                     )
+                    checkout_links[plan] = resp.get("checkout_url")
                 except Exception as exc:
                     checkout_error = str(exc)
 
@@ -2467,8 +2464,8 @@ def billing_and_credits(
             "credits": credits,
             "history": credits_history,
             "subscriptions": subscriptions,
-            "checkout": checkout,
-            "checkout_error": checkout_error,
+            **({"checkout_links": checkout_links} if include_checkout_preview else {}),
+            **({"checkout_error": checkout_error} if checkout_error else {}),
         }
     finally:
         client.close()
