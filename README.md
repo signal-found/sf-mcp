@@ -333,9 +333,6 @@ The Signal Found Chrome Extension connects your Reddit account to the platform. 
 For local installs, copy `.env.example` to `.env`:
 
 ```env
-# Signal Found API (production — no change needed)
-ONBOARD_API_BASE_URL=https://onboard.signal-found.com
-
 # Your client ID from signal-found.com
 ONBOARD_API_CLIENT_ID=your-client-id-here
 
