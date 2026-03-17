@@ -590,6 +590,8 @@ def create_new_account(
     try:
         created = client.post("/agent-onboarding/signup/agent", json=payload)
         client_id = str(created.get("client_id") or "").strip()
+        login_result = None
+        balance = 0
         if auto_login and client_id:
             login_result = client.post(
                 "/login",
@@ -597,12 +599,17 @@ def create_new_account(
                 json={"client_id": client_id},
             )
             _set_session_client_id(client_id)
-        else:
-            login_result = None
+            try:
+                credits_result = client.get("/credits", client_id=client_id)
+                balance = int(credits_result.get("credits_balance", 0) or 0)
+            except Exception:
+                pass
 
         return {
             "account": created,
             "authenticated_context_set": bool(auto_login and client_id),
+            "credits_balance": balance,
+            "setup_info": _build_setup_message(balance, client_id) if client_id else None,
             "login": login_result,
         }
     finally:
