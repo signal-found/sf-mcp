@@ -5,6 +5,8 @@
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-green)](https://python.org)
 
+[![Signal Found MCP server](https://glama.ai/mcp/servers/signal-found/sf-mcp/badges/card.svg)](https://glama.ai/mcp/servers/signal-found/sf-mcp)
+
 ---
 
 ## What is Signal Found?
