@@ -148,8 +148,9 @@ def _build_setup_message(balance: int, client_id: str) -> str:
         "── Getting started ──────────────────────────────────────────────────",
         "",
         "DIY (use your own Reddit account):",
-        "  Install the Chrome extension to link your Reddit account:",
-        "  https://onboard.signal-found.com/extensions/reddit",
+        "  1. Install the Chrome extension: https://onboard.signal-found.com/extensions/reddit",
+        "  2. Open Reddit and log in with the account you want to use",
+        "  3. Run register_reddit_account(reddit_username) to register it here",
         "",
         "Managed bot network (1000s of DMs/day):",
         "  We operate hundreds of Reddit accounts on your behalf.",
@@ -532,6 +533,55 @@ def logout_client_context() -> dict[str, Any]:
         "logged_out": True,
         "previous_client_id": previous,
     }
+
+
+@mcp.tool()
+def register_reddit_account(
+    reddit_username: str,
+    display_name: str | None = None,
+    client_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    Register a Reddit account (socket) with this Signal Found client after connecting
+    the Chrome extension.
+
+    Run this immediately after installing the Chrome extension and logging into Reddit.
+    The extension connects your browser session; this tool registers the account with
+    Signal Found so the AI agent can use it for outreach.
+
+    Steps:
+    1. Install the Chrome extension: https://onboard.signal-found.com/extensions/reddit
+    2. Open Reddit and make sure you are logged in
+    3. Call this tool with your Reddit username
+
+    Args:
+        reddit_username: Your Reddit username (without u/ prefix)
+        display_name: Optional friendly label for this account
+    """
+    settings = Settings.from_env()
+    resolved_client_id = _require_client_id(client_id, settings)
+
+    client = _client()
+    try:
+        result = client.post(
+            "/socket-groups/register",
+            client_id=resolved_client_id,
+            json={
+                "client_id": resolved_client_id,
+                "reddit_username": reddit_username,
+                "display_name": display_name,
+                "platform": "reddit",
+            },
+        )
+        return {
+            "registered": result.get("success", False),
+            "reddit_username": result.get("reddit_username", reddit_username),
+            "is_new": result.get("is_new", False),
+            "socket_group_ids": result.get("socket_group_ids", []),
+            "next_step": "Your Reddit account is now registered. The agent can use it to send DMs.",
+        }
+    finally:
+        client.close()
 
 
 @mcp.tool()

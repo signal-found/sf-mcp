@@ -324,9 +324,13 @@ When you run out of credits, any outreach tool will automatically provide direct
 
 ## Chrome Extension
 
-The Signal Found Chrome Extension connects your Reddit account to the platform. Install it, open Reddit, and your agent can start sending DMs immediately.
+The Signal Found Chrome Extension connects your Reddit account to the platform.
 
-**[→ Install for Chrome](https://onboard.signal-found.com/extensions/reddit)**
+1. **[Install for Chrome](https://onboard.signal-found.com/extensions/reddit)**
+2. Open Reddit and make sure you're logged into the account you want to use
+3. Ask your agent to run `register_reddit_account(reddit_username)` to register it with Signal Found
+
+Your account is now live — the agent can use it to send DMs.
 
 ---
 
