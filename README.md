@@ -9,6 +9,28 @@
 
 ---
 
+## Table of Contents
+
+- [What is Signal Found?](#what-is-signal-found)
+- [Two Ways to Operate](#two-ways-to-operate)
+- [Quick Setup](#quick-setup)
+  - [Claude Desktop](#claude-desktop)
+  - [Claude Code (CLI)](#claude-code-cli)
+  - [Cursor](#cursor)
+  - [VS Code (GitHub Copilot)](#vs-code-github-copilot)
+  - [Windsurf](#windsurf)
+  - [Cline](#cline-vs-code-extension)
+  - [Smithery](#smithery)
+- [Local Install (Alternative)](#local-install-alternative)
+- [How It Works](#how-it-works)
+- [Available Tools](#available-tools)
+- [Pricing & Credits](#pricing--credits)
+- [Chrome Extension](#chrome-extension)
+- [Configuration Reference](#configuration-reference)
+- [Support](#support)
+
+---
+
 ## What is Signal Found?
 
 Signal Found is a Reddit-native outreach platform. You describe your product, we find people on Reddit already asking for it, and your AI agent handles the rest — messaging prospects, tracking replies, and optimizing your funnel in real time.
