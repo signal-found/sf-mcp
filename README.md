@@ -3,15 +3,17 @@
 **The only AI tool that connects directly to a proprietary Reddit outreach network — find your prospects, personalize your pitch, and send thousands of DMs per day.**
 
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io)
+[![PyPI](https://img.shields.io/pypi/v/sf-mcp)](https://pypi.org/project/sf-mcp/)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-green)](https://python.org)
+[![smithery badge](https://smithery.ai/badge/sf-mcp)](https://smithery.ai/server/sf-mcp)
 
 ---
 
 ## What is Signal Found?
 
-Signal Found is a Reddit-native B2C/B2B outreach platform. You describe your product, we find people on Reddit already asking for it, and your AI agent handles the rest — messaging prospects, tracking replies, and optimizing your funnel in real time.
+Signal Found is a Reddit-native outreach platform. You describe your product, we find people on Reddit already asking for it, and your AI agent handles the rest — messaging prospects, tracking replies, and optimizing your funnel in real time.
 
-This MCP server gives **Claude, Cursor, Copilot**, and any other MCP-compatible AI agent direct access to the Signal Found platform. Your agent can:
+This MCP server gives **Claude, Cursor, VS Code Copilot, Windsurf**, and any other MCP-compatible AI agent direct access to the Signal Found platform. Your agent can:
 
 - **Set up your product** and targeting strategy (subreddits, keywords, positioning)
 - **Find prospects** already posting about problems your product solves
@@ -37,33 +39,141 @@ Don't want to use your own account? We operate a private network of **hundreds o
 
 ---
 
-## Quick Start
+## Quick Setup
 
-### 1. Install
+**Easiest: use our hosted server — nothing to install.**
+
+Get your `client_id` at [signal-found.com](https://signal-found.com), then pick your client below.
+
+---
+
+### Claude Desktop
+
+Edit `claude_desktop_config.json`:
+- **Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "signal-found": {
+      "url": "https://mcp.signal-found.com/mcp"
+    }
+  }
+}
+```
+
+Restart Claude Desktop, then tell it: `Login to Signal Found with client ID: <your-client-id>`
+
+---
+
+### Claude Code (CLI)
+
+```bash
+claude mcp add signal-found --transport http https://mcp.signal-found.com/mcp
+```
+
+Or add to `.mcp.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "signal-found": {
+      "type": "http",
+      "url": "https://mcp.signal-found.com/mcp"
+    }
+  }
+}
+```
+
+---
+
+### Cursor
+
+Add to `.cursor/mcp.json` in your project (or `~/.cursor/mcp.json` globally):
+
+```json
+{
+  "mcpServers": {
+    "signal-found": {
+      "url": "https://mcp.signal-found.com/mcp"
+    }
+  }
+}
+```
+
+---
+
+### VS Code (GitHub Copilot)
+
+Add to `.vscode/mcp.json` in your project:
+
+```json
+{
+  "servers": {
+    "signal-found": {
+      "type": "http",
+      "url": "https://mcp.signal-found.com/mcp"
+    }
+  }
+}
+```
+
+Or add via the VS Code command palette: `MCP: Add Server` → HTTP → paste `https://mcp.signal-found.com/mcp`
+
+---
+
+### Windsurf
+
+Edit `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "signal-found": {
+      "serverUrl": "https://mcp.signal-found.com/mcp"
+    }
+  }
+}
+```
+
+---
+
+### Cline (VS Code Extension)
+
+Open Cline settings → MCP Servers → Add Server → paste:
+
+```
+https://mcp.signal-found.com/mcp
+```
+
+---
+
+### Smithery
+
+One-click install at **[smithery.ai/server/sf-mcp](https://smithery.ai/server/sf-mcp)** — Smithery will prompt you for your `client_id` and handle the rest.
+
+---
+
+## Local Install (Alternative)
+
+If you prefer to run the server locally rather than use the hosted deployment:
 
 ```bash
 pip install sf-mcp
+# or: uvx sf-mcp
 ```
 
-Or with `uv`:
-```bash
-uvx sf-mcp
-```
+Then use this config in any client above, replacing the `url` approach:
 
-### 2. Get Your Client ID
-
-Sign up at [signal-found.com](https://signal-found.com) to get your `client_id`.
-
-### 3. Add to Your AI Client
-
-**Claude Desktop** (`~/.claude/claude_desktop_config.json`):
+**Claude Desktop:**
 ```json
 {
   "mcpServers": {
     "signal-found": {
-      "command": "sf-mcp",
+      "command": "uvx",
+      "args": ["sf-mcp"],
       "env": {
-        "ONBOARD_API_BASE_URL": "https://onboard.signal-found.com",
         "ONBOARD_API_CLIENT_ID": "your-client-id-here"
       }
     }
@@ -71,44 +181,20 @@ Sign up at [signal-found.com](https://signal-found.com) to get your `client_id`.
 }
 ```
 
-**Cursor** (`.cursor/mcp.json` in your project):
+**Cursor / VS Code / Windsurf:**
 ```json
 {
   "mcpServers": {
     "signal-found": {
-      "command": "sf-mcp",
+      "command": "uvx",
+      "args": ["sf-mcp"],
       "env": {
-        "ONBOARD_API_BASE_URL": "https://onboard.signal-found.com",
         "ONBOARD_API_CLIENT_ID": "your-client-id-here"
       }
     }
   }
 }
 ```
-
-**Claude Code** (add to your project's `.mcp.json`):
-```json
-{
-  "mcpServers": {
-    "signal-found": {
-      "command": "sf-mcp",
-      "env": {
-        "ONBOARD_API_BASE_URL": "https://onboard.signal-found.com",
-        "ONBOARD_API_CLIENT_ID": "your-client-id-here"
-      }
-    }
-  }
-}
-```
-
-### 4. Tell Your Agent to Start
-
-```
-Login with my Signal Found client ID: <your-client-id>
-Then run the onboarding quickstart for my product: <product description>
-```
-
-Your agent will handle the rest — product setup, targeting, and first outbound messages.
 
 ---
 
@@ -123,7 +209,7 @@ problems your product solves
 Your agent configures targeting (subreddits, keywords,
 market positioning, conversion notes)
         ↓
-Messages are sent via your Chrome extension or
+Messages sent via your Chrome extension or
 our managed account network
         ↓
 Replies land in your Signal Found CRM
@@ -138,7 +224,7 @@ Your agent tracks them, follows up, and closes
 | Tool | Description |
 |------|-------------|
 | `login_with_client_id` | Authenticate your session, check credit balance |
-| `agent_quickstart` | Get the recommended agent workflow for zero-context onboarding |
+| `agent_quickstart` | Recommended agent workflow for zero-context onboarding |
 | `create_new_account` | Create a new Signal Found client account |
 | `create_new_product` | Register a product and start the onboarding flow |
 | `get_onboarding_status` | Check onboarding completion for a product |
@@ -193,45 +279,21 @@ Your agent tracks them, follows up, and closes
 ### Billing & Credits
 | Tool | Description |
 |------|-------------|
-| `billing_and_credits` | Credit balance, history, and optional Stripe checkout URL generation |
+| `billing_and_credits` | Credit balance, history, and Stripe checkout URL generation |
 
 ---
 
 ## Pricing & Credits
 
-Credits are consumed when Signal Found generates outreach messages and sends DMs. One credit ≈ one message.
+Credits are consumed when Signal Found generates and sends outreach messages. One credit ≈ one message.
 
-| Plan | Credits | Use Case |
-|------|---------|----------|
-| **Starter** | 1,000 credits | Testing and early outreach |
-| **Pro** | 7,000 credits | Active campaigns at scale |
-| **Bot Network** | Unlimited | Contact us — [admin@signal-found.com](mailto:admin@signal-found.com) |
+| Plan | Credits | Price |
+|------|---------|-------|
+| **Starter** | 1,000 credits | Buy via `billing_and_credits` tool |
+| **Pro** | 7,000 credits | Buy via `billing_and_credits` tool |
+| **Bot Network** | Unlimited | [admin@signal-found.com](mailto:admin@signal-found.com) |
 
-Purchase credits anytime through the `billing_and_credits` tool — your agent will generate a direct Stripe checkout link.
-
-When you run out of credits, any outreach tool will tell you exactly how to buy more without leaving your AI client.
-
----
-
-## Configuration Reference
-
-Copy `.env.example` to `.env` and fill in your values:
-
-```env
-# Signal Found API (production endpoint — no change needed)
-ONBOARD_API_BASE_URL=https://onboard.signal-found.com
-
-# Your client ID from signal-found.com
-ONBOARD_API_CLIENT_ID=your-client-id-here
-
-# Request timeout (seconds)
-ONBOARD_API_TIMEOUT_SECONDS=60
-
-# Transport: stdio for Claude Desktop/Cursor, streamable-http for hosted
-MCP_TRANSPORT=stdio
-```
-
-> **Note:** For most users, only `ONBOARD_API_CLIENT_ID` needs to be set. The rest have sensible defaults.
+When you run out of credits, any outreach tool will automatically provide direct Stripe checkout links — no need to leave your AI client.
 
 ---
 
@@ -243,11 +305,31 @@ The Signal Found Chrome Extension connects your Reddit account to the platform. 
 
 ---
 
+## Configuration Reference
+
+For local installs, copy `.env.example` to `.env`:
+
+```env
+# Signal Found API (production — no change needed)
+ONBOARD_API_BASE_URL=https://onboard.signal-found.com
+
+# Your client ID from signal-found.com
+ONBOARD_API_CLIENT_ID=your-client-id-here
+
+# Request timeout (seconds)
+ONBOARD_API_TIMEOUT_SECONDS=60
+
+# Transport: stdio for local, streamable-http for hosted
+MCP_TRANSPORT=stdio
+```
+
+---
+
 ## Support
 
+- **Website:** [signal-found.com](https://signal-found.com)
 - **Email:** [admin@signal-found.com](mailto:admin@signal-found.com)
 - **Bot network onboarding:** [admin@signal-found.com](mailto:admin@signal-found.com)
-- **App / billing:** [signal-found.com](https://signal-found.com)
 
 ---
 
