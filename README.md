@@ -52,7 +52,7 @@ uvx sf-mcp
 
 ### 2. Get Your Client ID
 
-Sign up at [app.signalfound.io](https://app.signalfound.io) to get your `client_id`.
+Sign up at [signal-found.com](https://signal-found.com) to get your `client_id`.
 
 ### 3. Add to Your AI Client
 
@@ -63,7 +63,7 @@ Sign up at [app.signalfound.io](https://app.signalfound.io) to get your `client_
     "signal-found": {
       "command": "sf-mcp",
       "env": {
-        "ONBOARD_API_BASE_URL": "https://api.signal-found.io",
+        "ONBOARD_API_BASE_URL": "https://onboard.signal-found.com",
         "ONBOARD_API_CLIENT_ID": "your-client-id-here"
       }
     }
@@ -78,7 +78,7 @@ Sign up at [app.signalfound.io](https://app.signalfound.io) to get your `client_
     "signal-found": {
       "command": "sf-mcp",
       "env": {
-        "ONBOARD_API_BASE_URL": "https://api.signal-found.io",
+        "ONBOARD_API_BASE_URL": "https://onboard.signal-found.com",
         "ONBOARD_API_CLIENT_ID": "your-client-id-here"
       }
     }
@@ -93,7 +93,7 @@ Sign up at [app.signalfound.io](https://app.signalfound.io) to get your `client_
     "signal-found": {
       "command": "sf-mcp",
       "env": {
-        "ONBOARD_API_BASE_URL": "https://api.signal-found.io",
+        "ONBOARD_API_BASE_URL": "https://onboard.signal-found.com",
         "ONBOARD_API_CLIENT_ID": "your-client-id-here"
       }
     }
@@ -219,9 +219,9 @@ Copy `.env.example` to `.env` and fill in your values:
 
 ```env
 # Signal Found API (production endpoint — no change needed)
-ONBOARD_API_BASE_URL=https://api.signal-found.io
+ONBOARD_API_BASE_URL=https://onboard.signal-found.com
 
-# Your client ID from app.signalfound.io
+# Your client ID from signal-found.com
 ONBOARD_API_CLIENT_ID=your-client-id-here
 
 # Request timeout (seconds)
@@ -247,7 +247,7 @@ The Signal Found Chrome Extension connects your Reddit account to the platform. 
 
 - **Email:** [admin@signal-found.com](mailto:admin@signal-found.com)
 - **Bot network onboarding:** [admin@signal-found.com](mailto:admin@signal-found.com)
-- **App / billing:** [app.signalfound.io](https://app.signalfound.io)
+- **App / billing:** [signal-found.com](https://signal-found.com)
 
 ---
 

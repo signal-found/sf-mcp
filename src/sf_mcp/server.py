@@ -96,8 +96,8 @@ def _require_client_id(explicit_client_id: str | None, settings: Settings) -> st
     return session_client_id
 
 
-_CREDIT_SUCCESS_URL = "https://app.signalfound.io/billing?payment=success"
-_CREDIT_CANCEL_URL = "https://app.signalfound.io/billing"
+_CREDIT_SUCCESS_URL = "https://signal-found.com/billing?payment=success"
+_CREDIT_CANCEL_URL = "https://signal-found.com/billing"
 
 
 def _make_credit_purchase_message(client_id: str) -> str:

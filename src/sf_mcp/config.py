@@ -12,7 +12,7 @@ class Settings:
 
     @staticmethod
     def from_env() -> "Settings":
-        base_url = os.getenv("ONBOARD_API_BASE_URL", "http://localhost:8080").rstrip("/")
+        base_url = os.getenv("ONBOARD_API_BASE_URL", "https://onboard.signal-found.com").rstrip("/")
         default_client_id = os.getenv("ONBOARD_API_CLIENT_ID") or None
         timeout_raw = os.getenv("ONBOARD_API_TIMEOUT_SECONDS", "60")
 
