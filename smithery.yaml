@@ -1,0 +1,24 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      clientId:
+        type: string
+        description: "Your Signal Found client ID (get one at signal-found.com)"
+      apiBaseUrl:
+        type: string
+        description: "Signal Found API base URL"
+        default: "https://onboard.signal-found.com"
+    required:
+      - clientId
+  commandFunction: |-
+    (config) => ({
+      command: "uvx",
+      args: ["sf-mcp"],
+      env: {
+        ONBOARD_API_CLIENT_ID: config.clientId,
+        ONBOARD_API_BASE_URL: config.apiBaseUrl || "https://onboard.signal-found.com",
+        MCP_TRANSPORT: "stdio"
+      }
+    })
