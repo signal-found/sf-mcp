@@ -5,7 +5,7 @@
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io)
 [![PyPI](https://img.shields.io/pypi/v/sf-mcp)](https://pypi.org/project/sf-mcp/)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-green)](https://python.org)
-[![smithery badge](https://smithery.ai/badge/sf-mcp)](https://smithery.ai/server/sf-mcp)
+[![smithery badge](https://smithery.ai/badge/signal-found/reddit-outreach)](https://smithery.ai/servers/signal-found/reddit-outreach)
 [![sf-mcp MCP server](https://glama.ai/mcp/servers/signal-found/sf-mcp/badges/score.svg)](https://glama.ai/mcp/servers/signal-found/sf-mcp)
 
 ---
@@ -174,7 +174,7 @@ https://mcp.signal-found.com/mcp
 
 ### Smithery
 
-One-click install at **[smithery.ai/server/sf-mcp](https://smithery.ai/server/sf-mcp)** — Smithery will prompt you for your `client_id` and handle the rest.
+One-click install at **[smithery.ai/servers/signal-found/reddit-outreach](https://smithery.ai/servers/signal-found/reddit-outreach)** — Smithery will prompt you for your `client_id` and handle the rest.
 
 ---
 
