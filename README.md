@@ -30,6 +30,8 @@
 - [Configuration Reference](#configuration-reference)
 - [Support](#support)
 
+[![Signal Found MCP server](https://glama.ai/mcp/servers/signal-found/sf-mcp/badges/card.svg)](https://glama.ai/mcp/servers/signal-found/sf-mcp)
+
 ---
 
 ## What is Signal Found?
@@ -362,3 +364,4 @@ MCP_TRANSPORT=stdio
 © 2025 Signal Found. All rights reserved.
 
 <!-- mcp-name: io.github.signal-found/sf-mcp -->
+
