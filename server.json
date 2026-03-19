@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.signal-found/sf-mcp",
+  "description": "Reddit outreach at scale — find prospects, send 1000s of DMs/day, and manage your CRM via AI agents.",
+  "repository": {
+    "url": "https://github.com/signal-found/sf-mcp",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "sf-mcp",
+      "version": "0.1.1",
+      "runtimeHint": "uvx",
+      "environmentVariables": [
+        {
+          "key": "ONBOARD_API_CLIENT_ID",
+          "description": "Your Signal Found client ID. Leave blank if you don't have one yet — run create_new_account to get started.",
+          "required": false
+        }
+      ],
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

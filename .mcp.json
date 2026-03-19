@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "signal-found": {
+      "command": "uvx",
+      "args": ["sf-mcp"],
+      "env": {
+        "ONBOARD_API_CLIENT_ID": "${ONBOARD_API_CLIENT_ID}"
+      }
+    }
+  }
+}

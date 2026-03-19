@@ -26,7 +26,7 @@ try:
 except ValueError:
     _mcp_port = 8080
 
-mcp = FastMCP("signal-found-onboard", host=_mcp_host, port=_mcp_port)
+mcp = FastMCP("signal-found-onboard", host=_mcp_host, port=_mcp_port, stateless_http=True)
 _session_client_id: str | None = None
 
 _ALLOWED_CONVERSION_STATES = {
@@ -81,19 +81,17 @@ def _set_session_client_id(client_id: str | None) -> None:
 
 
 def _require_client_id(explicit_client_id: str | None, settings: Settings) -> str:
+    # Explicit arg > session > env var default
+    if explicit_client_id and explicit_client_id.strip():
+        return explicit_client_id.strip()
     session_client_id = _get_session_client_id()
-    if not session_client_id:
-        raise ValueError(
-            "No authenticated client context found. Run login_with_client_id first."
-        )
-    if explicit_client_id:
-        requested = explicit_client_id.strip()
-        if requested and requested != session_client_id:
-            raise ValueError(
-                "Provided client_id does not match authenticated session context. "
-                "Run login_with_client_id with the desired client_id first."
-            )
-    return session_client_id
+    if session_client_id:
+        return session_client_id
+    if settings.default_client_id:
+        return settings.default_client_id
+    raise ValueError(
+        "No authenticated client context found. New user? Run create_new_account(business_name, email) to sign up. Existing user? Run login_with_client_id(client_id) first."
+    )
 
 
 _CREDIT_SUCCESS_URL = "https://signal-found.com/billing?payment=success"
@@ -150,8 +148,9 @@ def _build_setup_message(balance: int, client_id: str) -> str:
         "── Getting started ──────────────────────────────────────────────────",
         "",
         "DIY (use your own Reddit account):",
-        "  Install the Chrome extension to link your Reddit account:",
-        "  https://onboard.signal-found.com/extensions/reddit",
+        "  1. Install the Chrome extension: https://onboard.signal-found.com/extensions/reddit",
+        "  2. Open Reddit and log in with the account you want to use",
+        "  3. Run register_reddit_account(reddit_username) to register it here",
         "",
         "Managed bot network (1000s of DMs/day):",
         "  We operate hundreds of Reddit accounts on your behalf.",
@@ -376,15 +375,29 @@ def sf_health() -> dict[str, Any]:
         except Exception as exc:
             onboard_error = str(exc)
 
+        authenticated = bool(_get_session_client_id())
+        has_default = bool(settings.default_client_id)
+        next_steps: list[str] = []
+        if not authenticated and not has_default:
+            next_steps = [
+                "No client ID configured. New user? Run create_new_account(business_name, email) to create an account and get your client_id.",
+                "Existing user? Run login_with_client_id(client_id) to authenticate this session.",
+            ]
+        elif not authenticated:
+            next_steps = [
+                "Run login_with_client_id(client_id) to activate the default client ID for this session.",
+            ]
+
         return {
             "server": "signal-found-onboard",
             "base_url": settings.onboard_api_base_url,
             "session_client_id": _get_session_client_id(),
-            "authenticated": bool(_get_session_client_id()),
-            "default_client_id_configured": bool(settings.default_client_id),
+            "authenticated": authenticated,
+            "default_client_id_configured": has_default,
             "onboard_api_ok": onboard_ok,
             "onboard_api": onboard_health,
             "onboard_api_error": onboard_error,
+            **({"next_steps": next_steps} if next_steps else {}),
         }
     finally:
         client.close()
@@ -450,16 +463,26 @@ def agent_quickstart() -> dict[str, Any]:
     """
     return {
         "goal": "Safely run onboarding and campaign launch with minimal context.",
+        "new_user_path": [
+            "1. create_new_account(business_name, email) — creates account + auto-logs in",
+            "2. create_new_product(product_name, website_url) — initialize onboarding",
+            "3. run_full_agentic_onboarding(...) — execute the full staged flow",
+        ],
         "order": [
             {
                 "step": 1,
                 "tool": "sf_health",
-                "why": "Verify backend connectivity and session auth state.",
+                "why": "Verify backend connectivity and session auth state. If not authenticated and no client_id, see new_user_path.",
+            },
+            {
+                "step": "1b (new users only)",
+                "tool": "create_new_account",
+                "why": "Create a new Signal Found account. Returns client_id and auto-authenticates this session. Skip if you already have a client_id.",
             },
             {
                 "step": 2,
                 "tool": "login_with_client_id",
-                "why": "Set authenticated client context required by business tools.",
+                "why": "Set authenticated client context required by business tools. Skip if create_new_account was just called (it auto-logs in).",
             },
             {
                 "step": 3,
@@ -510,6 +533,55 @@ def logout_client_context() -> dict[str, Any]:
         "logged_out": True,
         "previous_client_id": previous,
     }
+
+
+@mcp.tool()
+def register_reddit_account(
+    reddit_username: str,
+    display_name: str | None = None,
+    client_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    Register a Reddit account (socket) with this Signal Found client after connecting
+    the Chrome extension.
+
+    Run this immediately after installing the Chrome extension and logging into Reddit.
+    The extension connects your browser session; this tool registers the account with
+    Signal Found so the AI agent can use it for outreach.
+
+    Steps:
+    1. Install the Chrome extension: https://onboard.signal-found.com/extensions/reddit
+    2. Open Reddit and make sure you are logged in
+    3. Call this tool with your Reddit username
+
+    Args:
+        reddit_username: Your Reddit username (without u/ prefix)
+        display_name: Optional friendly label for this account
+    """
+    settings = Settings.from_env()
+    resolved_client_id = _require_client_id(client_id, settings)
+
+    client = _client()
+    try:
+        result = client.post(
+            "/socket-groups/register",
+            client_id=resolved_client_id,
+            json={
+                "client_id": resolved_client_id,
+                "reddit_username": reddit_username,
+                "display_name": display_name,
+                "platform": "reddit",
+            },
+        )
+        return {
+            "registered": result.get("success", False),
+            "reddit_username": result.get("reddit_username", reddit_username),
+            "is_new": result.get("is_new", False),
+            "socket_group_ids": result.get("socket_group_ids", []),
+            "next_step": "Your Reddit account is now registered. The agent can use it to send DMs.",
+        }
+    finally:
+        client.close()
 
 
 @mcp.tool()
@@ -568,6 +640,8 @@ def create_new_account(
     try:
         created = client.post("/agent-onboarding/signup/agent", json=payload)
         client_id = str(created.get("client_id") or "").strip()
+        login_result = None
+        balance = 0
         if auto_login and client_id:
             login_result = client.post(
                 "/login",
@@ -575,12 +649,17 @@ def create_new_account(
                 json={"client_id": client_id},
             )
             _set_session_client_id(client_id)
-        else:
-            login_result = None
+            try:
+                credits_result = client.get("/credits", client_id=client_id)
+                balance = int(credits_result.get("credits_balance", 0) or 0)
+            except Exception:
+                pass
 
         return {
             "account": created,
             "authenticated_context_set": bool(auto_login and client_id),
+            "credits_balance": balance,
+            "setup_info": _build_setup_message(balance, client_id) if client_id else None,
             "login": login_result,
         }
     finally:
@@ -2414,22 +2493,19 @@ def billing_and_credits(
             client_id=resolved_client_id,
         )
 
-        checkout: dict[str, Any] | None = None
+        checkout_links: dict[str, Any] = {}
         checkout_error: str | None = None
         if include_checkout_preview:
-            if not success_url or not cancel_url:
-                checkout_error = "success_url and cancel_url are required when include_checkout_preview=true"
-            else:
+            s_url = success_url or _CREDIT_SUCCESS_URL
+            c_url = cancel_url or _CREDIT_CANCEL_URL
+            for plan in ("starter", "pro", "automation"):
                 try:
-                    checkout = client.post(
+                    resp = client.post(
                         "/credits/checkout",
                         client_id=resolved_client_id,
-                        json={
-                            "plan": checkout_plan,
-                            "success_url": success_url,
-                            "cancel_url": cancel_url,
-                        },
+                        json={"plan": plan, "success_url": s_url, "cancel_url": c_url},
                     )
+                    checkout_links[plan] = resp.get("checkout_url")
                 except Exception as exc:
                     checkout_error = str(exc)
 
@@ -2438,8 +2514,8 @@ def billing_and_credits(
             "credits": credits,
             "history": credits_history,
             "subscriptions": subscriptions,
-            "checkout": checkout,
-            "checkout_error": checkout_error,
+            **({"checkout_links": checkout_links} if include_checkout_preview else {}),
+            **({"checkout_error": checkout_error} if checkout_error else {}),
         }
     finally:
         client.close()
